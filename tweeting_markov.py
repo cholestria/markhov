@@ -4,69 +4,60 @@ import sys
 from random import choice
 
 
-def open_and_read_file(filepath):
+def open_and_read_file(file_path):
     """Takes file path as string; returns text as string.
-
     Takes a string that is a file path, opens the file, and turns
     the file's contents as one string of text.
     """
-    file = open(filepath)
-    open_file = file.read()
-    file.close()
 
-    return open_file
+    corpus = open(file_path).read()
 
 
-def make_chains(text_string):
+    return corpus
+
+
+def make_chains(input_text):
     """Takes input text as string; returns _dictionary_ of markov chains.
-
     A chain will be a key that consists of a tuple of (word1, word2)
     and the value would be a list of the word(s) that follow those two
     words in the input text.
-
     For example:
-
         >>> make_chains("hi there mary hi there juanita")
         {('hi', 'there'): ['mary', 'juanita'], ('there', 'mary'): ['hi'], ('mary', 'hi': ['there']}
     """
 
+    words = input_text.split()
     chains = {}
 
-    words = text_string.split()
+    for i in range(len(words)-2):
+        my_tuple = words[i], words[i+1]
+        new_value = words[i+2]
 
-    for i in range(len(words) - 2):
-        key = (words[i], words[i + 1])
-        value = words[i + 2]
-
-        if key not in chains:
-            chains[key] = []
-
-        chains[key].append(value)    
+        if my_tuple not in chains:
+            chains[(my_tuple)] = [new_value]
+        else:
+            chains[my_tuple].append(new_value)
 
     return chains
 
 
-def make_text(chains, max_characters):
+def make_text(chains):
     """Takes dictionary of markov chains; returns random text."""
 
+    random_text = ""
     key = choice(chains.keys())
-    words = [key[0], key[1]]
+    random_text = random_text + key[0] + " " + key[1]
 
     while key in chains:
-        word = choice(chains[key])
-        twitter_text = " ".join(words) + " " + word
-        if len(twitter_text) < max_characters:
-            words.append(word)
-            key = tuple(words[-2:])
-        else:
-            break    
-    
-    result = " ".join(words)
+        value = choice(chains[key])
+        random_text = random_text + " " + value
+        key = key[1], value
 
-    print result
-    return result
+    twitter_text = random_text[:140]
 
+    return twitter_text
 
+    # return random_text   
 def tweet_function(chains):
     """takes chains as input and asks if we want to tweet"""
 
@@ -85,10 +76,20 @@ def tweet_function(chains):
     # while True:
 
     if user_input == "Y":
-        status = api.PostUpdate(make_text(chains, 140))
+        status = api.PostUpdate(make_text(chains))
         print status.text
 
-input_path = "janeausten.txt"
+        # elif user_input == "q":
+        #     break
+
+        # else:         
+        #     print "I didn't understand"
+        #     continue
+
+
+    
+
+input_path = sys.argv[1]
 
 # Open the file and turn it into one long string
 input_text = open_and_read_file(input_path)
@@ -97,9 +98,7 @@ input_text = open_and_read_file(input_path)
 chains = make_chains(input_text)
 
 # Produce random text
-random_text = make_text(chains, 140)
+other_random_text = make_text(chains)
 
 # print other_random_text
 tweet_status = tweet_function(chains)
-
-# print random_text
