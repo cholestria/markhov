@@ -63,7 +63,6 @@ def make_text(chains, max_characters):
     
     result = " ".join(words)
 
-    print result
     return result
 
 
@@ -78,15 +77,21 @@ def tweet_function(chains):
 
     # print api.VerifyCredentials()
 
-    
+    print "This will be your Tweet: "
+    tweet = make_text(chains, 140) 
+    print tweet
 
-    user_input = raw_input("Do you want to tweet? ")
+    user_input = raw_input("""Do you want to tweet it?
+    1. Yes 
+    2. Exit
+    >>  """)
 
-    # while True:
-
-    if user_input == "Y":
-        status = api.PostUpdate(make_text(chains, 140))
-        print status.text
+    while True:
+        if user_input == "1":
+            api.PostUpdate(tweet)
+            # print status.text
+        else: 
+            break    
 
 input_path = "janeausten.txt"
 
