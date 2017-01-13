@@ -2,6 +2,7 @@ import twitter
 import os
 import sys
 from random import choice
+from string import punctuation
 
 
 def open_and_read_file(filepath):
@@ -31,19 +32,38 @@ def make_chains(text_string):
     """
 
     chains = {}
+    caps_chain = {}
+    end_chains = {}
 
     words = text_string.split()
+    end_punctuation = "."
 
     for i in range(len(words) - 2):
         key = (words[i], words[i + 1])
         value = words[i + 2]
 
-        if key not in chains:
-            chains[key] = []
+        for char in key:
+            if key[-1] == end_punctuation:
+                end_chains[key] = []
+            elif key[0].isupper():
+                caps_chain[key] = []
+            elif key not in chains:
+                chains[key] = []
 
-        chains[key].append(value)    
+    end_chains[key].append(value)
+    chains[key].append(value)
+    caps_chain[key].append(value)
 
-    return chains
+    print end_chains
+
+
+    # return chains
+
+    # if first letter of first word in the key is caps - add to caps dictionary
+    # if last character of 2nd word in the key is punctuation - add to the end dictionary
+
+
+
 
 
 def make_text(chains, max_characters):
@@ -59,8 +79,8 @@ def make_text(chains, max_characters):
             words.append(word)
             key = tuple(words[-2:])
         else:
-            break    
-    
+            break
+
     result = " ".join(words)
 
     return result
@@ -69,29 +89,29 @@ def make_text(chains, max_characters):
 def tweet_function(chains):
     """takes chains as input and asks if we want to tweet"""
 
-    api = twitter.Api(
-        consumer_key=os.environ['TWITTER_CONSUMER_KEY'],
-        consumer_secret=os.environ['TWITTER_CONSUMER_SECRET'],
-        access_token_key=os.environ['TWITTER_ACCESS_TOKEN_KEY'],
-        access_token_secret=os.environ['TWITTER_ACCESS_TOKEN_SECRET'])
+    # api = twitter.Api(
+    #     consumer_key=os.environ['TWITTER_CONSUMER_KEY'],
+    #     consumer_secret=os.environ['TWITTER_CONSUMER_SECRET'],
+    #     access_token_key=os.environ['TWITTER_ACCESS_TOKEN_KEY'],
+    #     access_token_secret=os.environ['TWITTER_ACCESS_TOKEN_SECRET'])
 
-    # print api.VerifyCredentials()
+    # # print api.VerifyCredentials()
 
-    print "This will be your Tweet: "
-    tweet = make_text(chains, 140) 
-    print tweet
+    # print "This will be your Tweet: "
+    # tweet = make_text(chains, 140)
+    # print tweet
 
-    user_input = raw_input("""Do you want to tweet it?
-    1. Yes 
-    2. Exit
-    >>  """)
+    # user_input = raw_input("""Do you want to tweet it?
+    # 1. Yes
+    # 2. Exit
+    # >>  """)
 
-    while True:
-        if user_input == "1":
-            api.PostUpdate(tweet)
-            # print status.text
-        else: 
-            break    
+    # while True:
+    #     if user_input == "1":
+    #         api.PostUpdate(tweet)
+    #         # print status.text
+    #     else:
+    #         break
 
 input_path = "janeausten.txt"
 
